@@ -1,6 +1,7 @@
 package com.codepath.bestsellerlistapp
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,12 +10,20 @@ import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.codepath.bestsellerlistapp.R
+import com.codepath.asynchttpclient.AsyncHttpClient
+import com.codepath.asynchttpclient.RequestParams
+import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import okhttp3.Headers
 
 // --------------------------------//
 // CHANGE THIS TO BE YOUR API KEY  //
 // --------------------------------//
-private const val API_KEY = "<YOUR-API-KEY-HERE>"
+
+
+
+private const val API_KEY = BuildConfig.API_KEY
 
 /*
  * The class for the only fragment in the app, which contains the progress bar,
@@ -46,6 +55,56 @@ class BestSellerBooksFragment : Fragment(), OnListFragmentInteractionListener {
         progressBar.show()
 
         // Create and set up an AsyncHTTPClient() here
+        // Create and set up an AsyncHTTPClient() here
+        val client = AsyncHttpClient()
+        val params = RequestParams()
+        params["api-key"] = API_KEY
+
+        // Using the client, perform the HTTP request
+        params["limit"] = "5"
+        params["page"] = "0"
+        client["https://api.nytimes.com/svc/books/v3/lists/current/hardcover-fiction.json", params, object :
+            JsonHttpResponseHandler() {
+            override fun onSuccess(statusCode: Int, headers: Headers, response: JsonHttpResponseHandler.JSON) {
+                // called when response HTTP status is "200 OK"
+                progressBar.hide()
+
+
+                try {
+                    val gson = Gson()
+
+                    // Extract "books" array from the response
+                    val booksJsonArray = response.jsonObject.getJSONObject("results").getJSONArray("books")
+
+                    // Convert JSON array to list of BestSellerBook
+                    val arrayBookType = object : TypeToken<List<BestSellerBook>>() {}.type
+                    Log.v("Json data", booksJsonArray.toString())
+                    val models: List<BestSellerBook> = gson.fromJson(booksJsonArray.toString(), arrayBookType)
+
+                    // Set the adapter
+                    recyclerView.adapter = BestSellerBooksRecyclerViewAdapter(models, this@BestSellerBooksFragment)
+                } catch (e: Exception) {
+                    Log.e("BestSellerBooksFragment", "Error parsing response", e)
+                }
+            }
+
+            override fun onFailure(
+                statusCode: Int,
+                headers: Headers?,
+                errorResponse: String,
+                t: Throwable?
+            ) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                progressBar.hide()
+
+                // If the error is not null, log it!
+                t?.message?.let {
+                    Log.e("BestSellerBooksFragment", errorResponse)
+                }
+            }
+        }]
+
+                //... etc
 
         // Using the client, perform the HTTP request
 
@@ -63,7 +122,6 @@ class BestSellerBooksFragment : Fragment(), OnListFragmentInteractionListener {
                 // The wait for a response is over
                 progressBar.hide()
 
-                //TODO - Parse JSON into Models
 
                 val models : List<BestSellerBook> = null // Fix me!
                 recyclerView.adapter = BestSellerBooksRecyclerViewAdapter(models, this@BestSellerBooksFragment)
