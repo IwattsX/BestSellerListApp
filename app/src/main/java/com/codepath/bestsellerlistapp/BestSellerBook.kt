@@ -1,7 +1,6 @@
 package com.codepath.bestsellerlistapp
 
 import com.google.gson.annotations.SerializedName
-import java.net.URI
 
 /**
  * The Model for storing a single book from the NY Times API

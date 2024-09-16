@@ -103,54 +103,6 @@ class BestSellerBooksFragment : Fragment(), OnListFragmentInteractionListener {
                 }
             }
         }]
-
-                //... etc
-
-        // Using the client, perform the HTTP request
-
-        /* Uncomment me once you complete the above sections!
-        {
-            /*
-             * The onSuccess function gets called when
-             * HTTP response status is "200 OK"
-             */
-            override fun onSuccess(
-                statusCode: Int,
-                headers: Headers,
-                json: JsonHttpResponseHandler.JSON
-            ) {
-                // The wait for a response is over
-                progressBar.hide()
-
-
-                val models : List<BestSellerBook> = null // Fix me!
-                recyclerView.adapter = BestSellerBooksRecyclerViewAdapter(models, this@BestSellerBooksFragment)
-
-                // Look for this in Logcat:
-                Log.d("BestSellerBooksFragment", "response successful")
-            }
-
-            /*
-             * The onFailure function gets called when
-             * HTTP response status is "4XX" (eg. 401, 403, 404)
-             */
-            override fun onFailure(
-                statusCode: Int,
-                headers: Headers?,
-                errorResponse: String,
-                t: Throwable?
-            ) {
-                // The wait for a response is over
-                progressBar.hide()
-
-                // If the error is not null, log it!
-                t?.message?.let {
-                    Log.e("BestSellerBooksFragment", errorResponse)
-                }
-            }
-        }]
-        */
-
     }
 
     /*
